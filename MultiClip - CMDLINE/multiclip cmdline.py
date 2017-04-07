@@ -1,7 +1,9 @@
-# MultiClip tool, used for copying to contents of .txt documents to the clipboard
-# Able to navigate between directories, to enable sorting of .txt files
-# Creates config file on first launch or if detecting an issue with selected MultiClip directory
+'''
+MultiClip tool, used for copying to contents of .txt documents to the clipboard.
+Able to navigate between directories, to enable sorting of .txt files.
 
+Creates config file on first launch or if detecting an issue with selected MultiClip directory.
+'''
 
 # imports
 import os

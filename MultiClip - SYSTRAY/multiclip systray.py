@@ -1,3 +1,12 @@
+'''
+Intended to run within the system tray -
+
+- Looks at a given folder and creats a nested menu context menu when clicking.
+- Nested menu will show all folders/files within the parent directory.
+- Selecting a folder will open a new nested menu for that folder.
+- Selecting a file will copy the file contents to the clipboard.
+'''
+
 import sys
 import os
 from PyQt5 import QtCore, QtGui, QtWidgets
