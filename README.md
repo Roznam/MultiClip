@@ -1,3 +1,15 @@
+## Multiclip Tools
+
+#### Multiclip - CmdLine
+
+A command line program for copying file contents to clipboard.
+
+On initial launch the program creates a config file, and prompts the user to enter their settings.
+Able to navigate between directories within the user specified 'home' folder, able to copy contents of txt files to clipboard.
+
+
+#### MultiClip - SysTray
+
 Currently non-operational.
 
 Intended to run within the system tray -
