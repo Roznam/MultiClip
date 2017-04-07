@@ -76,8 +76,9 @@ files_in_dir = []
 items_for_menu = []
 
 
-# Program header
 def header():
+    '''Program header'''
+
     cols = int(windowsize_cols)
     msg_margins = ("." * int(windowsize_cols))
     if (cols - 9) % 2 == 0:
@@ -87,14 +88,16 @@ def header():
     print(msg_margins + "\n" + body + "\n" + msg_margins + "\n")
 
 
-# Call to clear screen and print header
 def header_clear():
+    '''Call to clear screen and print header'''
+
     os.system("cls")
     header()
 
 
-# Prompt user to return to the main menu
 def menu_return():
+    '''Prompt user to return to the main menu'''
+
         input("\nPress 'Enter' to return to the main menu:")
         clear_lists()
         change_current_dir(home_dir)
@@ -106,22 +109,25 @@ def find_parent(folder):
     current_dir = (str(os.path.abspath(os.path.join(folder, os.pardir))) + "\\")
 
 
-# Change current_dir variable value
 def change_current_dir(new_folder):
+    '''Change current_dir variable value'''
+
     global current_dir
     current_dir = new_folder
 
 
-# Clear lists when changing current directory
 def clear_lists():
+    '''Clear lists when changing current directory'''
+
     global folders_in_dir, files_in_dir, items_for_menu
     folders_in_dir = []
     files_in_dir = []
     items_for_menu = []
 
 
-# Fetches the contents of a directory, adds results to three lists
 def fetch_dir_contents(directory):
+    '''Fetches the contents of a directory, adds results to three lists'''
+
     for object in os.listdir(directory):
         object_path = directory + object
 
@@ -136,20 +142,23 @@ def fetch_dir_contents(directory):
         items_for_menu.append(file)
 
 
-# Copies the contents of a .txt file to the clipboard
 def copy_file_contents(file):
+    '''Copies the contents of a .txt file to the clipboard'''
+
     txt_to_copy = open((file), "r").read()
     pyperclip.copy(txt_to_copy)
     print("Copied file contents to clipboard.")
 
 
-# Call when closing the program
 def close():
+    '''Call when closing the program'''
+
     exit()
 
 
-# Uses lists to generate menu items, folders then files
 def draw_menu(folder):
+    '''Uses lists to generate menu items, folders then files'''
+
     print(f"Displaying items within: {folder}")
     fetch_dir_contents(folder)
     menu_num = 1
@@ -173,8 +182,9 @@ def draw_menu(folder):
     print("\nPress 'Q' to exit")
 
 
-# Allows selection of an item from the menu, redraws menu as necessary
 def menu_selection():
+    '''Allows selection of an item from the menu, redraws menu as necessary'''
+
     selection = input("\n> ")
     header_clear()
 
@@ -213,8 +223,9 @@ def menu_selection():
             menu_return()
 
 
-# Main menu for program, prints header and available options
 def menu(folder):
+    '''Main menu for program, prints header and available options'''
+
     header_clear()
     draw_menu(folder)
     menu_selection()
