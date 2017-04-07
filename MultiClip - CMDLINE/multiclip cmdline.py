@@ -3,8 +3,9 @@
 # Creates config file on first launch or if detecting an issue with selected MultiClip directory
 
 
-#imports
-import os, pyperclip
+# imports
+import os
+import pyperclip
 from configparser import ConfigParser
 
 # Read / create config file if none exists
@@ -13,7 +14,7 @@ config_status = 0
 
 for i in range(2):
     if config_status == 0:
-        if os.path.isfile("config.ini") == True:
+        if os.path.isfile("config.ini") is True:
 
             try:
                 config = ConfigParser()
@@ -34,7 +35,7 @@ for i in range(2):
 
             while multiclipfolder == "":
                 entry = input("\nEnter the folderpath for the multiclip directory:\n> ")
-                if os.path.isdir(entry) == True:
+                if os.path.isdir(entry) is True:
                     multiclipfolder = entry.upper()
                     if multiclipfolder[-1] != "\\":
                         multiclipfolder += "\\"
@@ -74,6 +75,7 @@ folders_in_dir = []
 files_in_dir = []
 items_for_menu = []
 
+
 # Program header
 def header():
     cols = int(windowsize_cols)
@@ -84,10 +86,12 @@ def header():
         body = "." * int((cols - 10) / 2) + "MULTI-CLIP" + "." * int((cols - 10) / 2)
     print(msg_margins + "\n" + body + "\n" + msg_margins + "\n")
 
+
 # Call to clear screen and print header
 def header_clear():
     os.system("cls")
     header()
+
 
 # Prompt user to return to the main menu
 def menu_return():
@@ -96,14 +100,17 @@ def menu_return():
         change_current_dir(home_dir)
         menu(home_dir)
 
+
 def find_parent(folder):
     global current_dir
     current_dir = (str(os.path.abspath(os.path.join(folder, os.pardir))) + "\\")
+
 
 # Change current_dir variable value
 def change_current_dir(new_folder):
     global current_dir
     current_dir = new_folder
+
 
 # Clear lists when changing current directory
 def clear_lists():
@@ -112,14 +119,15 @@ def clear_lists():
     files_in_dir = []
     items_for_menu = []
 
+
 # Fetches the contents of a directory, adds results to three lists
 def fetch_dir_contents(directory):
     for object in os.listdir(directory):
         object_path = directory + object
 
-        if os.path.isfile(object_path) == True:
+        if os.path.isfile(object_path) is True:
             files_in_dir.append(object_path)
-        elif os.path.isdir(object_path) == True:
+        elif os.path.isdir(object_path) is True:
             folders_in_dir.append(object_path + "\\")
 
     for folder in folders_in_dir:
@@ -127,15 +135,18 @@ def fetch_dir_contents(directory):
     for file in files_in_dir:
         items_for_menu.append(file)
 
+
 # Copies the contents of a .txt file to the clipboard
 def copy_file_contents(file):
     txt_to_copy = open((file), "r").read()
     pyperclip.copy(txt_to_copy)
     print("Copied file contents to clipboard.")
 
+
 # Call when closing the program
 def close():
     exit()
+
 
 # Uses lists to generate menu items, folders then files
 def draw_menu(folder):
@@ -160,6 +171,7 @@ def draw_menu(folder):
         print("There are no objects within this directory to view.")
 
     print("\nPress 'Q' to exit")
+
 
 # Allows selection of an item from the menu, redraws menu as necessary
 def menu_selection():
@@ -199,6 +211,7 @@ def menu_selection():
             header_clear()
             print ("Invalid entry.")
             menu_return()
+
 
 # Main menu for program, prints header and available options
 def menu(folder):
