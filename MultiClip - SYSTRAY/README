@@ -1,8 +1,11 @@
 Currently non-operational.
 
-Intended to run within the system tray, look at a given folder and created a nested menu context menu when clicking.
-Nested menu will show all folders/files within the parent directory, selecting a folder will open a new nested menu for that folder.
-Selecting a file will copy the file contents to the clipboard.
+Intended to run within the system tray -
+
+- Looks at a given folder and creats a nested menu context menu when clicking.
+- Nested menu will show all folders/files within the parent directory.
+- Selecting a folder will open a new nested menu for that folder.
+- Selecting a file will copy the file contents to the clipboard.
 
 At present, the file can create a system tray icon, with a context menu, and create items of a single given directory.
 
