@@ -24,11 +24,13 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         exitAction = menu.addAction("Exit",)
         exitAction.triggered.connect(parent.close)
 
+    def list_subfolders_gui(mc_dir):
         for object in os.listdir(mc_dir):
             object_path = mc_dir + object
             if os.path.isdir(object_path):
                 dirEntry = menu.addMenu(object)
 
+    def list_files_gui(mc_dir):
         for object in os.listdir(mc_dir):
             object_path = mc_dir + object
             if os.path.isfile(object_path):
@@ -36,6 +38,24 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
                 fileAction.triggered.connect(self.testing_func)
 
         self.setContextMenu(menu)
+
+    subfolders = []
+    def list_subfolders(path):
+        for i in os.listdir(path):
+            object_path = path +'/'+ i
+            if os.path.isdir(object_path) is True:
+                print ">> Folder : ", object_path
+                # subfolders.append(object_path)
+                self.list_files(object_path)
+                print '\n'
+                self.list_subfolders(object_path)
+
+    def list_files(path):
+         for i in os.listdir(path):
+             object_path = path +'/'+ i
+             if os.path.isfile(object_path) is True:
+                 print object_path
+
 
     def testing_func(self):
         snd = self.sender().text()
@@ -47,6 +67,7 @@ def main(image):
 
     w = QtWidgets.QWidget()
     trayIcon = SystemTrayIcon(QtGui.QIcon(image), w)
+    trayIcon.list_subfolders(mc_dir)
 
     trayIcon.show()
     sys.exit(app.exec_())
