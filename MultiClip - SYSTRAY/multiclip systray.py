@@ -50,6 +50,14 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
                 self.list_subfolders(object_path, subfolder_menu)
         self.list_files(path, menu)
 
+    def create_submenu(self, i, menu):
+        '''
+        Create submenu in the menu for subfolder.
+        '''
+        # print ">> Folder : ", object_path
+        subfolder_menu = menu.addMenu(i)
+        return subfolder_menu
+
     def list_files(self, path, menu):
         '''
         Lists files in the folder.
@@ -61,14 +69,6 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
                  self.create_file_in_menu(i, menu)
         #  print '\n'
     
-    def create_submenu(self, i, menu):
-        '''
-        Create submenu in the menu for subfolder.
-        '''
-        # print ">> Folder : ", object_path
-        subfolder_menu = menu.addMenu(i)
-        return subfolder_menu
-
     def create_file_in_menu(self, i, menu):
         '''
         Create file in the menu.
