@@ -57,15 +57,15 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
          for i in os.listdir(path):
              object_path = path +'/'+ i
              if os.path.isfile(object_path) is True:
-                 print object_path
+                #  print object_path
                  self.create_file_in_menu(i, menu)
-         print '\n'
+        #  print '\n'
     
     def create_submenu(self, i, menu):
         '''
         Create submenu in the menu for subfolder.
         '''
-        print ">> Folder : ", object_path
+        # print ">> Folder : ", object_path
         subfolder_menu = menu.addMenu(i)
         return subfolder_menu
 
