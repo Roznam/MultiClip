@@ -16,48 +16,64 @@ mc_dir = "D:\\Python\\MC\\"
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
-    menu_items = []
-
     def __init__(self, icon, parent=None):
         QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
         menu = QtWidgets.QMenu(parent)
-        exitAction = menu.addAction("Exit",)
+
+        self.create_exit(menu)
+        self.list_subfolders(mc_dir, menu)
+        self.setContextMenu(menu)
+    
+    def create_exit(self, menu):
+        '''
+            Creates exit option in menu.
+        '''
+        exitAction = menu.addAction("Exit")
         exitAction.triggered.connect(parent.close)
 
-    def list_subfolders_gui(mc_dir):
-        for object in os.listdir(mc_dir):
-            object_path = mc_dir + object
-            if os.path.isdir(object_path):
-                dirEntry = menu.addMenu(object)
-
-    def list_files_gui(mc_dir):
-        for object in os.listdir(mc_dir):
-            object_path = mc_dir + object
-            if os.path.isfile(object_path):
-                fileAction = menu.addAction(object)
-                fileAction.triggered.connect(self.testing_func)
-
-        self.setContextMenu(menu)
-
-    subfolders = []
-    def list_subfolders(path):
+    def list_subfolders(self, path, menu=menu):
+        '''
+            Detects subfolders, calls file lister for main folder.
+            Recursively calls itself for subfolders.
+        '''
         for i in os.listdir(path):
             object_path = path +'/'+ i
             if os.path.isdir(object_path) is True:
-                print ">> Folder : ", object_path
-                # subfolders.append(object_path)
+                subfolder_menu = self.create_submenu(i, menu)
                 self.list_files(object_path)
-                print '\n'
-                self.list_subfolders(object_path)
+                self.list_subfolders(object_path, subfolder_menu)
 
-    def list_files(path):
+    def list_files(self, path):
+        '''
+        Lists files in the folder.
+        '''
          for i in os.listdir(path):
              object_path = path +'/'+ i
              if os.path.isfile(object_path) is True:
                  print object_path
+                 self.create_file_in_menu(i, menu)
+         print '\n'
+    
+    def create_submenu(self, i, menu):
+        '''
+        Create submenu in the menu for subfolder.
+        '''
+        print ">> Folder : ", object_path
+        subfolder_menu = menu.addMenu(i)
+        return subfolder_menu
+
+    def create_file_in_menu(self, i, menu):
+        '''
+        Create file in the menu.
+        '''
+        file_menu = menu.addAction(i)
+        file_menu.triggered.connect(self.testing_func)
 
 
     def testing_func(self):
+        '''
+        Till the actual functionality is added.
+        '''
         snd = self.sender().text()
         print(f"detected: {snd}")
 
@@ -67,7 +83,6 @@ def main(image):
 
     w = QtWidgets.QWidget()
     trayIcon = SystemTrayIcon(QtGui.QIcon(image), w)
-    trayIcon.list_subfolders(mc_dir)
 
     trayIcon.show()
     sys.exit(app.exec_())
