@@ -1,18 +1,7 @@
-'''
-Intended to run within the system tray -
-
-- Looks at a given folder and creats a nested menu context menu when clicking.
-- Nested menu will show all folders/files within the parent directory.
-- Selecting a folder will open a new nested menu for that folder.
-- Selecting a file will copy the file contents to the clipboard.
-'''
-
-import sys
-import os
+import sys, os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 mc_dir = "D:\\Python\\MC\\"
-
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
@@ -84,10 +73,12 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         snd = self.sender().text()
         print(f"detected: {snd}")
 
+    def create_submenu(self, i, menu):
+        subfolder_menu = menu.addMenu(i)
+        return subfolder_menu
 
 def main(image):
     app = QtWidgets.QApplication(sys.argv)
-
     w = QtWidgets.QWidget()
     trayIcon = SystemTrayIcon(QtGui.QIcon(image), w)
 
@@ -95,5 +86,5 @@ def main(image):
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    on = r'D:\Python\mc.ico'
+    on=r'D:\Python\mc.ico'
     main(on)
