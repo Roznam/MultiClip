@@ -20,18 +20,25 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
         menu = QtWidgets.QMenu(parent)
 
-        self.create_exit(menu)
+        self.create_exit()
         self.list_subfolders(mc_dir, menu)
         self.setContextMenu(menu)
-    
+
     def create_exit(self, menu):
         '''
             Creates exit option in menu.
         '''
         exitAction = menu.addAction("Exit")
-        exitAction.triggered.connect(parent.close)
+        exitAction.triggered.connect(self.close)
 
-    def list_subfolders(self, path, menu=menu):
+    def close(self):
+        '''
+            Call to exit the program
+        '''
+        exit()
+
+
+    def list_subfolders(self, path, menu):
         '''
             Detects subfolders, calls file lister for main folder.
             Recursively calls itself for subfolders.
@@ -40,10 +47,10 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             object_path = path +'/'+ i
             if os.path.isdir(object_path) is True:
                 subfolder_menu = self.create_submenu(i, menu)
-                self.list_files(object_path)
                 self.list_subfolders(object_path, subfolder_menu)
+        self.list_files(path, menu)
 
-    def list_files(self, path):
+    def list_files(self, path, menu):
         '''
         Lists files in the folder.
         '''
