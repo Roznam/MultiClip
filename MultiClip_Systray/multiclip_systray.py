@@ -11,13 +11,7 @@ import sys
 import os
 import pyperclip
 from PyQt5 import QtCore, QtGui, QtWidgets
-from config import mc_dir, systray_icon, set_mc_dir, set_systray_icon
-
-if mc_dir is None:
-    set_mc_dir()
-
-if systray_icon is None:
-    set_systray_icon()
+from config import config, mc_dir, systray_icon
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
@@ -66,10 +60,10 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         '''
             Lists files in the folder.
         '''
-         for file_name in os.listdir(path):
-             file_path = path +'/'+ file_name
-             if os.path.isfile(file_path) is True:
-                 self.add_file_to_menu(file_name, file_path, menu)
+        for file_name in os.listdir(path):
+            file_path = path +'/'+ file_name
+            if os.path.isfile(file_path) is True:
+                self.add_file_to_menu(file_name, file_path, menu)
 
     def add_file_to_menu(self, file_name, file_path, menu):
         '''
@@ -83,7 +77,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             Copies the selected files contents to clipboard.
         '''
         with open(object_path, "r") as file:
-            text_to_copy = file.read()
+            txt_to_copy = file.read()
         pyperclip.copy(txt_to_copy)
 
 
@@ -97,5 +91,6 @@ def main(image):
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
+    config()
     on = systray_icon
     main(on)
