@@ -56,10 +56,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         for i in os.listdir(path):
             object_path = path +'/'+ i
             if os.path.isfile(object_path) is True:
-                self.create_file_in_menu(object_path, menu) # changed "i" to object_path
-                # changed due to an issue with opening the file, when using "i" - unable to open the file to copy
-                # when clicked, will need to find new solution as it is not feasible to have full filepath for each item
-                # even though with "i" it is being detected that "namehere.txt" is being clicked, unable to find/open file
+                self.create_file_in_menu(i, object_path, menu)
     
     def create_submenu(self, i, menu):
         '''
@@ -68,19 +65,18 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         subfolder_menu = menu.addMenu(i)
         return subfolder_menu
 
-    def create_file_in_menu(self, i, menu):
+    def create_file_in_menu(self, i, path, menu):
         '''
         Create file in the menu.
         '''
         file_menu = menu.addAction(i)
-        file_menu.triggered.connect(self.copy_contents)
+        file_menu.triggered.connect(lambda: self.copy_contents(path))
 
-    def copy_contents(self):
+    def copy_contents(self, path):
         '''
         Copies the selected files contents to clipboard.
         '''
-        snd = self.sender().text()
-        txt_to_copy = open((snd), "r").read()
+        txt_to_copy = open((path), "r").read()
         pyperclip.copy(txt_to_copy)
 
 def main(image):
