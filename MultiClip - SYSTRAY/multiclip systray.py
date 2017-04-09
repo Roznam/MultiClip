@@ -1,17 +1,19 @@
 '''
-Intended to run within the system tray -
+Runs within the system tray -
 
-- Looks at a given folder and creats a nested menu context menu when clicking.
+- Looks at a given folder and creates a nested context on right-click.
 - Nested menu will show all folders/files within the parent directory.
-- Selecting a folder will open a new nested menu for that folder.
-- Selecting a file will copy the file contents to the clipboard.
+- Selecting a folder opens a new nested menu for that folder.
+- Selecting a file copies the file contents to the clipboard.
 '''
 
 import sys
 import os
+import pyperclip
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 mc_dir = "D:\\Python\\MC\\"
+systray_icon = "D:\\Python\\mc.ico"
 
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
@@ -20,9 +22,10 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
         menu = QtWidgets.QMenu(parent)
 
-        self.create_exit()
         self.list_subfolders(mc_dir, menu)
         self.setContextMenu(menu)
+        menu.addSeparator()
+        self.create_exit(menu)
 
     def create_exit(self, menu):
         '''
@@ -37,52 +40,48 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         '''
         exit()
 
-
     def list_subfolders(self, path, menu):
         '''
             Detects subfolders, calls file lister for main folder.
             Recursively calls itself for subfolders.
         '''
-        for i in os.listdir(path):
-            object_path = path +'/'+ i
+        for object_name in os.listdir(path):
+            object_path = path +'/'+ object_name
             if os.path.isdir(object_path) is True:
-                subfolder_menu = self.create_submenu(i, menu)
+                subfolder_menu = self.create_submenu(object_name, menu)
                 self.list_subfolders(object_path, subfolder_menu)
         self.list_files(path, menu)
 
-    def create_submenu(self, i, menu):
+    def create_submenu(self, subfolder_name, menu):
         '''
-        Create submenu in the menu for subfolder.
+            Create submenu in the menu for subfolder.
         '''
-        # print ">> Folder : ", object_path
-        subfolder_menu = menu.addMenu(i)
+        subfolder_menu = menu.addMenu(subfolder_name)
         return subfolder_menu
 
     def list_files(self, path, menu):
         '''
-        Lists files in the folder.
+            Lists files in the folder.
         '''
-         for i in os.listdir(path):
-             object_path = path +'/'+ i
-             if os.path.isfile(object_path) is True:
-                #  print object_path
-                 self.create_file_in_menu(i, menu)
-        #  print '\n'
-    
-    def create_file_in_menu(self, i, menu):
-        '''
-        Create file in the menu.
-        '''
-        file_menu = menu.addAction(i)
-        file_menu.triggered.connect(self.testing_func)
+         for file_name in os.listdir(path):
+             file_path = path +'/'+ file_name
+             if os.path.isfile(file_path) is True:
+                 self.add_file_to_menu(file_name, file_path, menu)
 
+    def add_file_to_menu(self, file_name, file_path, menu):
+        '''
+            Create file in the menu.
+        '''
+        file_menu = menu.addAction(file_name)
+        file_menu.triggered.connect(lambda: self.copy_contents(file_path))
 
-    def testing_func(self):
+    def copy_contents(self, object_path):
         '''
-        Till the actual functionality is added.
+            Copies the selected files contents to clipboard.
         '''
-        snd = self.sender().text()
-        print(f"detected: {snd}")
+        with open(object_path, "r") as file:
+            text_to_copy = file.read()
+        pyperclip.copy(txt_to_copy)
 
 
 def main(image):
@@ -95,5 +94,5 @@ def main(image):
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    on = r'D:\Python\mc.ico'
+    on = systray_icon
     main(on)
