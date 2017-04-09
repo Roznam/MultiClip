@@ -11,10 +11,13 @@ import sys
 import os
 import pyperclip
 from PyQt5 import QtCore, QtGui, QtWidgets
+from config import mc_dir, systray_icon, set_mc_dir, set_systray_icon
 
-mc_dir = "D:\\Python\\MC\\"
-systray_icon = "D:\\Python\\mc.ico"
+if mc_dir is None:
+    set_mc_dir()
 
+if systray_icon is None:
+    set_systray_icon()
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
