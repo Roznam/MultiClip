@@ -1,12 +1,11 @@
-Currently non-operational.
+A system tray application that creates a nested menu of the given directory, able to copy txt file contents to clipboard.
 
-Intended to run within the system tray -
+- Looks at a given folder and creates a nested context menu on right-click.
+- Nested menu shows all folders/files within the parent directory.
+- Selecting a folder opens a new nested menu for that folder.
+- Selecting a file copies the file contents to the clipboard.
 
-- Looks at a given folder and creats a nested menu context menu when clicking.
-- Nested menu will show all folders/files within the parent directory.
-- Selecting a folder will open a new nested menu for that folder.
-- Selecting a file will copy the file contents to the clipboard.
+Above functions are currently working.
 
-At present, the file can create a system tray icon, with a context menu, and create items of a single given directory.
-
-Currently unable to have the program search through subfolders and create relevant entries.
+Still need to implement a configuration step, so that on first launch if unable to find a config file it will prompt user to enter
+their MultiClip directory.
