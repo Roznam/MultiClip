@@ -2,18 +2,8 @@
 
 #### MultiClip - SysTray
 
-A system tray application that creates a nested menu of the given directory, able to copy txt file contents to clipboard.
+MultiClip runs within the system tray and creates a nested context menu for the selected folder, displaying all txt files. Upon selecting a txt file from the menu, the contents are copied into the clipboard.
 
-- Looks at a given folder and creates a nested context menu on right-click.
-- Nested menu shows all folders/files within the parent directory.
-- Selecting a folder opens a new nested menu for that folder.
-- Selecting a file copies the file contents to the clipboard.
-
-Currently requires amending the config settings within the .pyw file.
-
-#### Multiclip - CmdLine
-
-A command line application for copying file contents to clipboard.
-
-On initial launch the program creates a config file, and prompts the user to enter their settings.
-Able to navigate between directories within the user specified 'home' folder, able to copy contents of txt files to clipboard.
+- On initial launch prompts for the parent directory for MultiClip, writes a config file to store this information
+- Creates a system tray icon, on right click displays a nested context menu displaying all subfolders and txt files
+- Selecting a file copies the contents of the txt file to the clipboard

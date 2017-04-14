@@ -1,7 +1,0 @@
-A system tray application that creates a nested menu of the given directory, able to copy txt file contents to clipboard.
-
-- On first launch prompts user for configuration settings: the location of the MultiClip directory, and system tray icon location.
-- Creates a system tray icon with a nested menu display on right-click.
-- The nested menu shows all folders/files within the MultiClip directory.
-- Selecting a folder opens a new nested menu for that folder.
-- Selecting a file copies the file contents to the clipboard.
