@@ -171,15 +171,15 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         pyperclip.copy(txt_to_copy)
 
 
-def main(image):
-    app = QtWidgets.QApplication(sys.argv)
-    w = QtWidgets.QWidget()
-    trayIcon = SystemTrayIcon(QtGui.QIcon(image), w)
-    trayIcon.show()
-    sys.exit(app.exec_())
+def main(image, application):
+    # application = QtWidgets.QApplication(sys.argv)
+    widget = QtWidgets.QWidget()
+    tray_icon = SystemTrayIcon(QtGui.QIcon(image), widget)
+    tray_icon.show()
+    sys.exit(application.exec_())
 
 if __name__ == '__main__':
-    con = QApplication(sys.argv)
-    ex = Config()
-    on = systray_icon
-    main(on)
+    application = QApplication(sys.argv)
+    config = Config()
+    image = systray_icon
+    main(image, application)
