@@ -25,63 +25,6 @@ class Config(QWidget):
             self.write_config()
             self.read_config()
 
-    def get_mc_dir(self):
-        '''
-            Input prompt popup for mc_dir, sets value globally for import
-            Calls 'popup' if value entered is not a valid directory path
-        '''
-        global mc_dir
-        text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip directory:", QLineEdit.Normal, "")
-        if okPressed and os.path.isdir(text) is True:
-            if text[-1] != "\\":
-                mc_dir = text
-            else:
-                mc_dir = text
-        else:
-            self.popup("get_mc_dir", "Not a valid directory", text)
-
-    def resource_path(self, relative_path):
-        '''
-            Get absolute path to resource, works for dev and for PyInstaller
-        '''
-        try:
-            base_path = sys._MEIPASS
-        except Exception:
-            base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
-
-    def get_systray_icon(self):
-        '''
-            Set systray variable to icon included with PyInstaller
-        '''
-        global systray_icon
-        path_test = self.resource_path("multiclip.ico")
-        systray_icon = path_test
-
-    def popup(self, function, error, path):
-        '''
-            Create a warning popup box containing: Error, function that called for the popup and invalid path
-        '''
-        buttonReply = QMessageBox.warning(self, "Config Error",
-                                          ("%s: \n" % error) + ("%s" % path), QMessageBox.Ok | QMessageBox.Close)
-        if buttonReply == QMessageBox.Ok:
-            if function == "get_mc_dir":
-                self.get_mc_dir()
-        if buttonReply == QMessageBox.Close:
-            exit()
-
-    def write_config(self):
-        '''
-            Writes config.ini after prompting user for input via popup input box
-        '''
-        self.get_mc_dir()
-
-        with open("config.ini", "w") as file:
-            file.write("[DEFAULTS]\n" +
-                       ("MultiClip_Directory = %s\n" % mc_dir)
-                       )
-
     def read_config(self):
         '''
             Reads config.ini file to set mc_dir and systray_icon
@@ -101,6 +44,63 @@ class Config(QWidget):
         else:
             config_status = 0
         return config_status
+
+    def get_systray_icon(self):
+        '''
+            Set systray variable to icon included with PyInstaller
+        '''
+        global systray_icon
+        path_test = self.resource_path("multiclip.ico")
+        systray_icon = path_test
+
+    def resource_path(self, relative_path):
+        '''
+            Get absolute path to resource, works for dev and for PyInstaller
+        '''
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
+
+    def write_config(self):
+        '''
+            Writes config.ini after prompting user for input via popup input box
+        '''
+        self.get_mc_dir()
+
+        with open("config.ini", "w") as file:
+            file.write("[DEFAULTS]\n" +
+                       ("MultiClip_Directory = %s\n" % mc_dir)
+                       )
+
+    def get_mc_dir(self):
+        '''
+            Input prompt popup for mc_dir, sets value globally for import
+            Calls 'popup' if value entered is not a valid directory path
+        '''
+        global mc_dir
+        text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip directory:", QLineEdit.Normal, "")
+        if okPressed and os.path.isdir(text) is True:
+            if text[-1] != "\\":
+                mc_dir = text
+            else:
+                mc_dir = text
+        else:
+            self.popup("get_mc_dir", "Not a valid directory", text)
+
+    def popup(self, function, error, path):
+        '''
+            Create a warning popup box containing: Error, function that called for the popup and invalid path
+        '''
+        buttonReply = QMessageBox.warning(self, "Config Error",
+                                          ("%s: \n" % error) + ("%s" % path), QMessageBox.Ok | QMessageBox.Close)
+        if buttonReply == QMessageBox.Ok:
+            if function == "get_mc_dir":
+                self.get_mc_dir()
+        if buttonReply == QMessageBox.Close:
+            exit()
 
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
