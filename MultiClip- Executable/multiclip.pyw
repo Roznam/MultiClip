@@ -23,6 +23,7 @@ class Config(QWidget):
 
         config_status = self.read_config()
         if config_status == 0:
+            self.get_mc_dir()
             self.write_config()
             self.read_config()
 
@@ -31,6 +32,7 @@ class Config(QWidget):
             Reads config.ini file to set mc_dir and systray_icon
             Calls get_systray_icon
         '''
+        global mc_dir
         if os.path.isfile("config.ini"):
             try:
                 systray_icon = self.get_systray_icon()
@@ -48,8 +50,7 @@ class Config(QWidget):
         '''
             Set systray variable to icon included with PyInstaller
         '''
-        systray_icon = self.get_absolute_path("multiclip.ico")
-        return systray_icon
+        return self.get_absolute_path("multiclip.ico")
 
     def get_absolute_path(self, relative_path):
         '''
@@ -66,12 +67,8 @@ class Config(QWidget):
         '''
             Writes config.ini after prompting user for input via popup input box
         '''
-        self.get_mc_dir()
-
         with open("config.ini", "w") as file:
-            file.write("[DEFAULTS]\n" +
-                       ("MultiClip_Directory = %s\n" % mc_dir)
-                       )
+            file.write("[DEFAULTS]\nMultiClip_Directory = %s\n" % mc_dir)
 
     def get_mc_dir(self):
         '''
@@ -81,10 +78,10 @@ class Config(QWidget):
         global mc_dir
         text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip directory:", QLineEdit.Normal, "")
         if okPressed and os.path.isdir(text) is True:
-            if text[-1] != "\\":
-                mc_dir = text
-            else:
-                mc_dir = text
+            # if text[-1] != "\\":
+            mc_dir = text
+            # else:
+            #     mc_dir = text
         else:
             self.popup("get_mc_dir", "Not a valid directory", text)
 
