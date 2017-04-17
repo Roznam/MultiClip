@@ -50,10 +50,9 @@ class Config(QWidget):
             Set systray variable to icon included with PyInstaller
         '''
         global systray_icon
-        path_test = self.resource_path("multiclip.ico")
-        systray_icon = path_test
+        systray_icon = self.get_absolute_path("multiclip.ico")
 
-    def resource_path(self, relative_path):
+    def get_absolute_path(self, relative_path):
         '''
             Get absolute path to resource, works for dev and for PyInstaller
         '''
