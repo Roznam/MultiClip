@@ -11,86 +11,30 @@ import sys
 import os
 import pyperclip
 from configparser import ConfigParser
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QMessageBox
+
+mc_dir = ''
+systray_icon = ''
+
 
 class Config(QWidget):
     def __init__(self):
         super().__init__()
 
-        if self.read_config() == 1:
-            self.read_config()
-        else:
+        config_status = self.read_config()
+        if config_status == 0:
             self.write_config()
             self.read_config()
-
 
     def initUI(self):
         self.get_mc_dir()
         self.get_systray_icon()
 
-    def get_mc_dir(self):
-        '''
-            Input prompt popup for mc_dir, sets value globally for import
-            Calls 'popup' if value entered is not a valid directory path
-        '''
-        global mc_dir
-        text, okPressed = QInputDialog.getText(self, "Configuration","MultiClip directory:", QLineEdit.Normal, "")
-        if okPressed and os.path.isdir(text) is True:
-            if text[-1] != "\\":
-                mc_dir = text
-            else:
-                mc_dir = text
-        else:
-            self.popup("get_mc_dir", "Not a valid directory", text)
-
-    def get_systray_icon(self):
-        '''
-            Check directory for "multiclip.ico", if unable to find, ask user to navigate to ico file
-        '''
-        global systray_icon
-        if os.path.isfile("multiclip.ico"):
-            systray_icon = "multiclip.ico"
-        else:
-            text, okPressed = QInputDialog.getText(self, "Configuration","MultiClip system tray icon:", QLineEdit.Normal, "")
-            if okPressed and os.path.isfile(text) is True:
-                if text[-3:].lower() == "ico":
-                    systray_icon = text
-                else:
-                    self.popup("get_systray_icon", "File must be .ico format", text)
-            else:
-                self.popup("get_systray_icon", "Not a valid filepath", text)
-
-    def popup(self, function, error, path):
-        '''
-            Create a warning popup box containing: Error, function that called for the popup and invalid path
-        '''
-        buttonReply = QMessageBox.warning(self, 'Config Error',
-                                          f"{error}: \n{path}", QMessageBox.Ok | QMessageBox.Close)
-        if buttonReply == QMessageBox.Ok:
-            if function == "get_mc_dir":
-                self.get_mc_dir()
-            elif function == "get_systray_icon":
-                self.get_systray_icon()
-
-    def write_config(self):
-        '''
-            Writes config.ini after prompting user for input via popup input box
-        '''
-        self.get_mc_dir()
-        self.get_systray_icon()
-
-        with open("config.ini", "w") as file:
-            file.write(f"[DEFAULTS]\n"
-                       f"MultiClip_Directory = {mc_dir}\n"
-                       f"System_Tray_Icon = {systray_icon}\n"
-                       )
-
     def read_config(self):
         '''
-            Reads config.ini file to set mc_dir and systray_icon
+            Read config.ini file to set mc_dir and systray_icon
         '''
-        config_status = None
         if os.path.isfile("config.ini"):
             try:
                 global mc_dir
@@ -105,6 +49,59 @@ class Config(QWidget):
         else:
             config_status = 0
         return config_status
+
+    def write_config(self):
+        '''
+            Write config.ini after prompting user for input via popup input box
+        '''
+        self.get_mc_dir()
+        self.get_systray_icon()
+
+        with open("config.ini", "w") as file:
+            file.write("[DEFAULTS]\nMultiClip_Directory = {0}\nSystem_Tray_Icon = {1}\n".format(mc_dir, systray_icon))
+
+    def get_mc_dir(self):
+        '''
+            Input prompt popup for mc_dir, sets value globally for import
+            Calls 'popup' if value entered is not a valid directory path
+        '''
+        global mc_dir
+        text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip directory:", QLineEdit.Normal, "")
+        if okPressed and os.path.isdir(text) is True:
+            mc_dir = text
+        else:
+            self.popup(0, "Not a valid directory", text)
+
+    def get_systray_icon(self):
+        '''
+            Check directory for "multiclip.ico"
+            If unable to find, ask user to navigate to ico file
+        '''
+        global systray_icon
+        if os.path.isfile("multiclip.ico"):
+            systray_icon = "multiclip.ico"
+        else:
+            text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip system tray icon:", QLineEdit.Normal, "")
+            if okPressed and os.path.isfile(text) is True:
+                if text[-3:].lower() == "ico":
+                    systray_icon = text
+                else:
+                    self.popup(1, "File must be .ico format", text)
+            else:
+                self.popup(1, "Not a valid filepath", text)
+
+    def popup(self, function, error, path):
+        '''
+            Create a warning popup box
+        '''
+        buttonReply = QMessageBox.warning(self, 'Config Error',
+                                          "{0}: \n{1}".format(error, path), QMessageBox.Ok | QMessageBox.Close)
+        if buttonReply == QMessageBox.Ok:
+            if function == 0:
+                self.get_mc_dir()
+            elif function == 1:
+                self.get_systray_icon()
+
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
     def __init__(self, icon, parent=None):
@@ -135,7 +132,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             Recursively calls itself for subfolders.
         '''
         for object_name in os.listdir(path):
-            object_path = path +'/'+ object_name
+            object_path = path + '/' + object_name
             if os.path.isdir(object_path) is True:
                 subfolder_menu = self.create_submenu(object_name, menu)
                 self.list_subfolders(object_path, subfolder_menu)
@@ -153,7 +150,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             Lists txt files in the folder.
         '''
         for file_name in os.listdir(path):
-            file_path = path +'/'+ file_name
+            file_path = path + '/' + file_name
             if os.path.isfile(file_path) is True:
                 if file_path[-3:] == "txt":
                     self.add_file_to_menu(file_name, file_path, menu)
@@ -173,17 +170,15 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             txt_to_copy = file.read()
         pyperclip.copy(txt_to_copy)
 
-def main(image):
-    app = QtWidgets.QApplication(sys.argv)
 
-    w = QtWidgets.QWidget()
-    trayIcon = SystemTrayIcon(QtGui.QIcon(image), w)
-
-    trayIcon.show()
-    sys.exit(app.exec_())
+def main(image, application):
+    widget = QWidget()
+    tray_icon = SystemTrayIcon(QtGui.QIcon(image), widget)
+    tray_icon.show()
+    sys.exit(application.exec_())
 
 if __name__ == '__main__':
-    con = QApplication(sys.argv)
-    ex = Config()
-    on = systray_icon
-    main(on)
+    application = QApplication(sys.argv)
+    config = Config()
+    image = systray_icon
+    main(image, application)

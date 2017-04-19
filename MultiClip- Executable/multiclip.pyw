@@ -14,33 +14,45 @@ from configparser import ConfigParser
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QMessageBox
 
+mc_dir = ''
+
 
 class Config(QWidget):
     def __init__(self):
         super().__init__()
 
-        if self.read_config() == 1:
-            self.read_config()
-        else:
+        config_status = self.read_config()
+        if config_status == 0:
+            self.get_mc_dir()
             self.write_config()
             self.read_config()
 
-    def get_mc_dir(self):
+    def read_config(self):
         '''
-            Input prompt popup for mc_dir, sets value globally for import
-            Calls 'popup' if value entered is not a valid directory path
+            Read config.ini file to set mc_dir and systray_icon
+            Calls get_systray_icon
         '''
         global mc_dir
-        text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip directory:", QLineEdit.Normal, "")
-        if okPressed and os.path.isdir(text) is True:
-            if text[-1] != "\\":
-                mc_dir = text
-            else:
-                mc_dir = text
+        if os.path.isfile("config.ini"):
+            try:
+                systray_icon = self.get_systray_icon()
+                config = ConfigParser()
+                config.read("config.ini")
+                mc_dir = config.get("DEFAULTS", "MultiClip_Directory")
+                config_status = 1
+            except:
+                config_status = 0
         else:
-            self.popup("get_mc_dir", "Not a valid directory", text)
+            config_status = 0
+        return config_status
 
-    def resource_path(self, relative_path):
+    def get_systray_icon(self):
+        '''
+            Set systray variable to icon included with PyInstaller
+        '''
+        return self.get_absolute_path("multiclip.ico")
+
+    def get_absolute_path(self, relative_path):
         '''
             Get absolute path to resource, works for dev and for PyInstaller
         '''
@@ -51,13 +63,27 @@ class Config(QWidget):
 
         return os.path.join(base_path, relative_path)
 
-    def get_systray_icon(self):
+    def write_config(self):
         '''
-            Set systray variable to icon included with PyInstaller
+            Write config.ini after prompting user for input via popup input box
         '''
-        global systray_icon
-        path_test = self.resource_path("multiclip.ico")
-        systray_icon = path_test
+        with open("config.ini", "w") as file:
+            file.write("[DEFAULTS]\nMultiClip_Directory = %s\n" % mc_dir)
+
+    def get_mc_dir(self):
+        '''
+            Input prompt popup for mc_dir, sets value globally for import
+            Calls 'popup' if value entered is not a valid directory path
+        '''
+        global mc_dir
+        text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip directory:", QLineEdit.Normal, "")
+        if okPressed and os.path.isdir(text) is True:
+            # if text[-1] != "\\":
+            mc_dir = text
+            # else:
+            #     mc_dir = text
+        else:
+            self.popup(0, "Not a valid directory", text)
 
     def popup(self, function, error, path):
         '''
@@ -66,41 +92,10 @@ class Config(QWidget):
         buttonReply = QMessageBox.warning(self, "Config Error",
                                           ("%s: \n" % error) + ("%s" % path), QMessageBox.Ok | QMessageBox.Close)
         if buttonReply == QMessageBox.Ok:
-            if function == "get_mc_dir":
+            if function == 0:
                 self.get_mc_dir()
         if buttonReply == QMessageBox.Close:
             exit()
-
-    def write_config(self):
-        '''
-            Writes config.ini after prompting user for input via popup input box
-        '''
-        self.get_mc_dir()
-
-        with open("config.ini", "w") as file:
-            file.write("[DEFAULTS]\n" +
-                       ("MultiClip_Directory = %s\n" % mc_dir)
-                       )
-
-    def read_config(self):
-        '''
-            Reads config.ini file to set mc_dir and systray_icon
-            Calls get_systray_icon
-        '''
-        config_status = None
-        if os.path.isfile("config.ini"):
-            try:
-                global mc_dir
-                self.get_systray_icon()
-                config = ConfigParser()
-                config.read("config.ini")
-                mc_dir = config.get("DEFAULTS", "MultiClip_Directory")
-                config_status = 1
-            except:
-                config_status = 0
-        else:
-            config_status = 0
-        return config_status
 
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
@@ -171,15 +166,14 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         pyperclip.copy(txt_to_copy)
 
 
-def main(image):
-    app = QtWidgets.QApplication(sys.argv)
-    w = QtWidgets.QWidget()
-    trayIcon = SystemTrayIcon(QtGui.QIcon(image), w)
-    trayIcon.show()
-    sys.exit(app.exec_())
+def main(image, application):
+    widget = QWidget()
+    tray_icon = SystemTrayIcon(QtGui.QIcon(image), widget)
+    tray_icon.show()
+    sys.exit(application.exec_())
 
 if __name__ == '__main__':
-    con = QApplication(sys.argv)
-    ex = Config()
-    on = systray_icon
-    main(on)
+    application = QApplication(sys.argv)
+    config = Config()
+    image = config.get_systray_icon()
+    main(image, application)
