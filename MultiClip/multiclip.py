@@ -72,7 +72,7 @@ class Config(object):
             If unable to find, ask user to navigate to ico file
         """
         if os.path.isfile("multiclip.ico"):
-            self.systray_icon = "multiclip.ico"
+            return "multiclip.ico"
         else:
             text, okPressed = QInputDialog.getText(widget, "Configuration",
                                                    "MultiClip system tray icon :",
@@ -106,7 +106,8 @@ class Config(object):
 
 class SystemTrayIcon(QSystemTrayIcon):
     def __init__(self, icon, src_dir, parent=None):
-        QSystemTrayIcon.__init__(self, icon, parent)
+        super(SystemTrayIcon, self).__init__(icon, parent)
+        # QSystemTrayIcon.__init__(self, icon, parent)
         menu = QMenu(parent)
 
         self.list_subfolders(src_dir, menu)
