@@ -29,7 +29,7 @@ class Config(QWidget):
 
     def read_config(self):
         '''
-            Reads config.ini file to set mc_dir and systray_icon
+            Read config.ini file to set mc_dir and systray_icon
             Calls get_systray_icon
         '''
         global mc_dir
@@ -65,7 +65,7 @@ class Config(QWidget):
 
     def write_config(self):
         '''
-            Writes config.ini after prompting user for input via popup input box
+            Write config.ini after prompting user for input via popup input box
         '''
         with open("config.ini", "w") as file:
             file.write("[DEFAULTS]\nMultiClip_Directory = %s\n" % mc_dir)
@@ -83,7 +83,7 @@ class Config(QWidget):
             # else:
             #     mc_dir = text
         else:
-            self.popup("get_mc_dir", "Not a valid directory", text)
+            self.popup(0, "Not a valid directory", text)
 
     def popup(self, function, error, path):
         '''
@@ -92,7 +92,7 @@ class Config(QWidget):
         buttonReply = QMessageBox.warning(self, "Config Error",
                                           ("%s: \n" % error) + ("%s" % path), QMessageBox.Ok | QMessageBox.Close)
         if buttonReply == QMessageBox.Ok:
-            if function == "get_mc_dir":
+            if function == 0:
                 self.get_mc_dir()
         if buttonReply == QMessageBox.Close:
             exit()
@@ -167,8 +167,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 
 def main(image, application):
-    # application = QtWidgets.QApplication(sys.argv)
-    widget = QtWidgets.QWidget()
+    widget = QWidget()
     tray_icon = SystemTrayIcon(QtGui.QIcon(image), widget)
     tray_icon.show()
     sys.exit(application.exec_())
