@@ -11,38 +11,26 @@ import sys
 import os
 import pyperclip
 from configparser import ConfigParser
-from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QMessageBox
-
-mc_dir = ''
-systray_icon = ''
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QMessageBox, QSystemTrayIcon, QMenu
 
 
-class Config(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        config_status = self.read_config()
-        if config_status == 0:
-            self.write_config()
-            self.read_config()
-
-    def initUI(self):
-        self.get_mc_dir()
-        self.get_systray_icon()
+class Config(object):
+    def __init__(self, widget):
+        self.source_dir = ''
+        self.systray_icon = ''
+        self.widget = widget
 
     def read_config(self):
         '''
-            Read config.ini file to set mc_dir and systray_icon
+            Read config.ini file to set source_dir and systray_icon
         '''
         if os.path.isfile("config.ini"):
             try:
-                global mc_dir
-                global systray_icon
                 config = ConfigParser()
                 config.read("config.ini")
-                mc_dir = config.get('DEFAULTS', 'MultiClip_Directory')
-                systray_icon = config.get('DEFAULTS', 'System_Tray_Icon')
+                self.source_dir = config.get('DEFAULTS', 'MultiClip_Directory')
+                self.systray_icon = config.get('DEFAULTS', 'System_Tray_Icon')
                 config_status = 1
             except:
                 config_status = 0
@@ -54,61 +42,67 @@ class Config(QWidget):
         '''
             Write config.ini after prompting user for input via popup input box
         '''
-        self.get_mc_dir()
+        self.get_source_dir()
         self.get_systray_icon()
 
         with open("config.ini", "w") as file:
-            file.write("[DEFAULTS]\nMultiClip_Directory = {0}\nSystem_Tray_Icon = {1}\n".format(mc_dir, systray_icon))
+            file.write("[DEFAULTS]\nMultiClip_Directory = {0}\nSystem_Tray_Icon = {1}\n".format(self.source_dir, self.systray_icon))
 
-    def get_mc_dir(self):
+    def get_source_dir(self):
         '''
-            Input prompt popup for mc_dir, sets value globally for import
+            Input prompt popup for source_dir, sets value globally for import
             Calls 'popup' if value entered is not a valid directory path
         '''
-        global mc_dir
-        text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip directory:", QLineEdit.Normal, "")
-        if okPressed and os.path.isdir(text) is True:
-            mc_dir = text
+        text, okPressed = QInputDialog.getText(widget, "Configuration", "MultiClip directory:", QLineEdit.Normal, "")
+        if okPressed is True:
+            if os.path.isdir(text) is True:
+                self.source_dir = text
+            else:
+                self.popup(0, "Not a valid directory", text)
         else:
-            self.popup(0, "Not a valid directory", text)
+            exit()
 
     def get_systray_icon(self):
         '''
             Check directory for "multiclip.ico"
             If unable to find, ask user to navigate to ico file
         '''
-        global systray_icon
         if os.path.isfile("multiclip.ico"):
-            systray_icon = "multiclip.ico"
+            self.systray_icon = "multiclip.ico"
         else:
-            text, okPressed = QInputDialog.getText(self, "Configuration", "MultiClip system tray icon:", QLineEdit.Normal, "")
-            if okPressed and os.path.isfile(text) is True:
-                if text[-3:].lower() == "ico":
-                    systray_icon = text
+            text, okPressed = QInputDialog.getText(widget, "Configuration", "MultiClip system tray icon :", QLineEdit.Normal, "")
+            if okPressed is True:
+                if os.path.isfile(text) is True:
+                    if text[-3:].lower() == "ico":
+                        self.systray_icon = text
+                    else:
+                        self.popup(1, "File must be .ico format", text)
                 else:
-                    self.popup(1, "File must be .ico format", text)
+                    self.popup(1, "Not a valid filepath", text)
             else:
-                self.popup(1, "Not a valid filepath", text)
+                exit()
 
     def popup(self, function, error, path):
         '''
             Create a warning popup box
         '''
-        buttonReply = QMessageBox.warning(self, 'Config Error',
+        buttonReply = QMessageBox.warning(widget, 'Config Error',
                                           "{0}: \n{1}".format(error, path), QMessageBox.Ok | QMessageBox.Close)
         if buttonReply == QMessageBox.Ok:
             if function == 0:
-                self.get_mc_dir()
+                self.get_source_dir()
             elif function == 1:
                 self.get_systray_icon()
+        if buttonReply == QMessageBox.Close:
+            exit()
 
 
-class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
-    def __init__(self, icon, parent=None):
-        QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
-        menu = QtWidgets.QMenu(parent)
+class SystemTrayIcon(QSystemTrayIcon):
+    def __init__(self, icon, source_dir, parent=None):
+        QSystemTrayIcon.__init__(self, icon, parent)
+        menu = QMenu(parent)
 
-        self.list_subfolders(mc_dir, menu)
+        self.list_subfolders(source_dir, menu)
         self.setContextMenu(menu)
         menu.addSeparator()
         self.create_exit(menu)
@@ -171,14 +165,19 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         pyperclip.copy(txt_to_copy)
 
 
-def main(image, application):
-    widget = QWidget()
-    tray_icon = SystemTrayIcon(QtGui.QIcon(image), widget)
+def main(image, source_dir, application, widget):
+    tray_icon = SystemTrayIcon(QtGui.QIcon(image), source_dir, widget)
     tray_icon.show()
     sys.exit(application.exec_())
 
 if __name__ == '__main__':
     application = QApplication(sys.argv)
-    config = Config()
-    image = systray_icon
-    main(image, application)
+    widget = QWidget()
+    config = Config(widget)
+    config_status = config.read_config()
+    if config_status == 0:
+        config.write_config()
+        config.read_config()
+    image = config.systray_icon
+    source_dir = config.source_dir
+    main(image, source_dir, application, widget)
