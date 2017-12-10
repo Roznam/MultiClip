@@ -4,5 +4,5 @@ MultiClip runs within the system tray and creates a nested context menu for the 
 
 ### Functionality
 - On initial launch prompts for the parent directory for MultiClip, writes a config file to store this information
-- Creates a system tray icon, on right click displays a nested context menu displaying all subfolders and txt files
+- Creates a system tray icon, on right click displays a nested context menu displaying all subfolders, folder shortcuts and txt files
 - Selecting a file copies the contents of the txt file to the clipboard
